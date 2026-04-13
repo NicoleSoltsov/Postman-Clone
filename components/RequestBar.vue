@@ -1,68 +1,82 @@
-<!-- components/RequestBar.vue -->
 <template>
-  <div>
-    <select v-model="method">
-      <option v-for="method in methods" :key="method" :value="method">
-        {{ method }}
-      </option>
-    </select>
+  <div class="space-y-2">
+    <div
+      class="flex gap-3 items-center bg-white dark:bg-gray-900 p-4 rounded-xl shadow"
+    >
+      <select
+        v-model="method"
+        class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+      >
+        <option v-for="method in methods" :key="method" :value="method">
+          {{ method }}
+        </option>
+      </select>
 
-    <input
-      v-model="url"
-      type="text"
-      placeholder="Enter request URL"
-      class="url-input"
-    />
+      <input
+        v-model="endpoint"
+        type="text"
+        placeholder="/users"
+        class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
 
-    <button @click="sendRequest" :disabled="loading">
-      {{ loading ? "Sending..." : "Send" }}
-    </button>
+      <button
+        @click="sendRequest"
+        :disabled="loading"
+        class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition"
+      >
+        {{ loading ? "Sending..." : "Send" }}
+      </button>
+    </div>
+    <p class="text-xs text-gray-500 px-1 flex items-center gap-1">
+      <span>Base URL:</span>
+      <span class="font-mono bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded">
+        {{ config.public.backend }}
+      </span>
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(["response"]);
+const config = useRuntimeConfig();
 
-const url = ref("");
-const method = ref("GET");
-const loading = ref(false);
+const emit = defineEmits<{
+  (e: "response", payload: ApiResponse): void;
+}>();
 
-const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+const endpoint = ref<string>("");
+const method = ref<string>("GET");
+const loading = ref<boolean>(false);
 
-const sendRequest = async () => {
-  if (!url.value) return;
+const methods: string[] = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+
+const sendRequest = async (): Promise<void> => {
+  if (!endpoint.value) return;
 
   loading.value = true;
 
-  try {
-    const res = await fetch(url.value, {
-      method: method.value,
-    });
+  const start = performance.now();
 
-    const contentType = res.headers.get("content-type");
+  const { data, error } = await tryRequestEndpoint<any>(
+    endpoint.value,
+    method.value,
+  );
 
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await res.json();
-    } else {
-      data = await res.text();
-    }
+  const duration = Math.round(performance.now() - start);
 
-    emit("response", {
-      status: res.status,
-      statusText: res.statusText,
-      data,
-    });
-  } catch (err) {
+  if (error) {
     emit("response", {
       status: "ERROR",
-      statusText: err.message,
+      statusText: error.message || "Request failed",
       data: null,
     });
-  } finally {
-    loading.value = false;
+  } else {
+    emit("response", {
+      status: 200, // your wrapper doesn't expose status → default OK
+      statusText: `OK (${duration} ms)`,
+      data,
+    });
   }
+
+  loading.value = false;
 };
 </script>
-
-<style scoped></style>

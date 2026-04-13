@@ -7,10 +7,11 @@
 </template>
 
 <script setup lang="ts">
-const response = ref(null);
+const response = ref();
 
-const handleResponse = (res) => {
+const handleResponse = (res: ApiResponse) => {
   response.value = res;
+  console.log(response.value);
 };
 </script>
 

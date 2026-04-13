@@ -13,6 +13,13 @@
       </select>
 
       <input
+        v-model="baseUrl"
+        type="text"
+        placeholder="https://base-url.com"
+        class="w-64 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+      />
+
+      <input
         v-model="endpoint"
         type="text"
         placeholder="/users"
@@ -27,10 +34,11 @@
         {{ loading ? "Sending..." : "Send" }}
       </button>
     </div>
+
     <p class="text-xs text-gray-500 px-1 flex items-center gap-1">
-      <span>Base URL:</span>
+      <span>Full URL:</span>
       <span class="font-mono bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded">
-        {{ config.public.backend }}
+        {{ fullUrl }}
       </span>
     </p>
   </div>
@@ -43,21 +51,28 @@ const emit = defineEmits<{
   (e: "response", payload: ApiResponse): void;
 }>();
 
-const endpoint = ref<string>("");
-const method = ref<string>("GET");
+const baseUrl = ref("");
+const endpoint = ref("");
+const method = ref<Method>("GET");
 const loading = ref<boolean>(false);
 
-const methods: string[] = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+const fullUrl = computed(() => {
+  if (!baseUrl.value) return endpoint.value;
+
+  const base = baseUrl.value.replace(/\/+$/, "");
+  const path = endpoint.value.replace(/^\/+/, "");
+
+  return `${base}/${path}`;
+});
 
 const sendRequest = async (): Promise<void> => {
-  if (!endpoint.value) return;
+  if (!endpoint.value && !baseUrl.value) return;
 
   loading.value = true;
-
   const start = performance.now();
 
   const { data, error } = await tryRequestEndpoint<any>(
-    endpoint.value,
+    fullUrl.value,
     method.value,
   );
 
@@ -71,7 +86,7 @@ const sendRequest = async (): Promise<void> => {
     });
   } else {
     emit("response", {
-      status: 200, // your wrapper doesn't expose status → default OK
+      status: 200,
       statusText: `OK (${duration} ms)`,
       data,
     });

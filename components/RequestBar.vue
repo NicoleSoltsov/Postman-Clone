@@ -7,7 +7,7 @@
         v-model="method"
         class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
       >
-        <option v-for="method in methods" :key="method" :value="method">
+        <option v-for="method in HTTPMethods" :key="method" :value="method">
           {{ method }}
         </option>
       </select>
@@ -45,15 +45,13 @@
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig();
-
 const emit = defineEmits<{
   (e: "response", payload: ApiResponse): void;
 }>();
 
 const baseUrl = ref("");
 const endpoint = ref("");
-const method = ref<Method>("GET");
+const method = ref<HTTPMethod>("GET");
 const loading = ref<boolean>(false);
 
 const fullUrl = computed(() => {

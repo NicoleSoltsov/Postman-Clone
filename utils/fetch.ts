@@ -46,6 +46,7 @@ async function requestEndpoint<T>(endpoint: string, method?: string, headers?: R
 async function requestEndpoint<T>(endpoint: string, method?: string, headers: Record<string, string> = {}, body?: any): Promise<T | void> {
   const config = useRuntimeConfig();
   const baseUrl = config.public.backend;
+console.log(config.public.backend)
 
   const options: RequestInit = {
     credentials: "include"
@@ -63,7 +64,7 @@ async function requestEndpoint<T>(endpoint: string, method?: string, headers: Re
 
     options.body = body
       ? isFormData
-        ? body // ✅ send FormData raw
+        ? body
         : JSON.stringify(body)
       : undefined;
   }

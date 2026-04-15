@@ -11,7 +11,6 @@ const response = ref();
 
 const handleResponse = (res: ApiResponse) => {
   response.value = res;
-  console.log(response.value);
 };
 </script>
 

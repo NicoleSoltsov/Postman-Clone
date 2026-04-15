@@ -1,15 +1,17 @@
 <template>
-  <div>
-    <div v-if="response">
-      <div>
-        <strong>Status:</strong>
-        {{ response.status }} {{ response.statusText }}
+  <div class="p-4">
+    <div v-if="response" class="space-y-3">
+      <div class="flex gap-4 text-sm">
+        <span>Status: {{ response.status }} {{ response.statusText }}</span>
+        <span>Time: {{ response.time }}ms</span>
       </div>
 
-      <div>{{ formattedData }}</div>
+      <div class="bg-gray-900 text-green-400 p-4 rounded overflow-auto text-sm">
+        {{ JSON.stringify(response.data, null, 2) }}
+      </div>
     </div>
 
-    <div v-else>No response yet</div>
+    <div v-else class="text-gray-500">No response yet</div>
   </div>
 </template>
 

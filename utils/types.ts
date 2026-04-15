@@ -4,6 +4,6 @@ export interface ApiResponse {
   data: unknown
 }
 
-export const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"] as const;
+export const HTTPMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"] as const;
 
-export type Method = typeof methods[number];
+export type HTTPMethod = typeof HTTPMethods[number];

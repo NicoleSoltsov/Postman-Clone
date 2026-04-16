@@ -5,15 +5,17 @@
         <span>Status: {{ response.status }} {{ response.statusText }}</span>
         <span>Time: {{ response.time }}ms</span>
 
-        <button
-          @click="isFormatted = !isFormatted"
-          class="ml-auto px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs"
+        <select
+          v-model="formatType"
+          class="ml-auto px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs"
         >
-          {{ isFormatted ? "Raw" : "Format JSON" }}
-        </button>
+          <option v-for="formatOption in formatOptions" :value="formatOption">
+            {{ formatOption }}
+          </option>
+        </select>
       </div>
 
-      <div class="bg-gray-900 text-white p-4 rounded text-sm whitespace-pre">
+      <div class="bg-gray-900 text-white p-4 rounded text-sm overflow-auto">
         {{ displayData }}
       </div>
     </div>
@@ -28,25 +30,27 @@ const props = defineProps({
 });
 
 const isFormatted = ref(true);
-
-const formattedData = computed(() => {
-  if (!props.response?.data) return "";
-
-  try {
-    return JSON.stringify(props.response.data, null, 2);
-  } catch {
-    return props.response.data;
-  }
-});
+const formatOptions = [
+  "JSON",
+  "XML",
+  "HTML",
+  "JavaScript",
+  "Markdown",
+  "Raw",
+  "Hex",
+  "Base64",
+] as const;
+type FormatOption = (typeof formatOptions)[number];
+const formatType = ref<FormatOption>("JSON");
 
 const rawData = computed(() => {
-  if (!props.response?.data) return "";
+  if (!props.response) return "";
+  return props.response.data;
+});
 
-  try {
-    return JSON.stringify(props.response.data);
-  } catch {
-    return props.response.data;
-  }
+const formattedData = computed(() => {
+  if (!props.response) return "";
+  //???????
 });
 
 const displayData = computed(() => {

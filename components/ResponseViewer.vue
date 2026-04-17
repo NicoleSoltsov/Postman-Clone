@@ -50,7 +50,51 @@ const rawData = computed(() => {
 
 const formattedData = computed(() => {
   if (!props.response) return "";
-  //???????
+  if (formatType.value === "Raw") return rawData.value;
+  else if (formatType.value === "Hex") {
+    return rawData.value
+      .split("")
+      .map((char) => char.charCodeAt(0).toString(16).padStart(2, "0"))
+      .join(" ");
+  } else if (formatType.value === "Base64") {
+    return btoa(rawData.value);
+  } else {
+    try {
+      const contentType = props.response.headers["content-type"] || "";
+      if (
+        formatType.value === "JSON" &&
+        contentType.includes("application/json")
+      ) {
+        return JSON.stringify(JSON.parse(rawData.value), null, 2);
+      } else if (
+        formatType.value === "XML" &&
+        contentType.includes("application/xml")
+      ) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(rawData.value, "application/xml");
+        const serializer = new XMLSerializer();
+        return serializer.serializeToString(xmlDoc);
+      } else if (
+        formatType.value === "HTML" &&
+        contentType.includes("text/html")
+      ) {
+        return rawData.value;
+      } else if (
+        formatType.value === "JavaScript" &&
+        contentType.includes("application/javascript")
+      ) {
+        return rawData.value;
+      } else if (
+        formatType.value === "Markdown" &&
+        contentType.includes("text/markdown")
+      ) {
+        return rawData.value;
+      }
+    } catch (e) {
+      return `Error formatting data: ${e}`;
+    }
+    return rawData.value;
+  }
 });
 
 const displayData = computed(() => {

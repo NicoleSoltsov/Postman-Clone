@@ -2,7 +2,12 @@
   <div class="container">
     <h1>Postman Clone</h1>
     <RequestBar @response="handleResponse" />
-    <ResponseViewer :response="response" />
+    <ParamsTabs />
+    <div class="">
+      <!-- split side by side -->
+      <ParamsInput />
+      <ResponseViewer :response="response" />
+    </div>
   </div>
 </template>
 

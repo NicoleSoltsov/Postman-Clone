@@ -2,10 +2,8 @@
   <div class="container">
     <h1>Postman Clone</h1>
     <RequestBar @response="handleResponse" />
-    <ParamsTabs />
+    <InputTabs />
     <div class="flex gap-4 mt-4">
-      <!-- split side by side -->
-      <ParamsInput class="" />
       <ResponseViewer :response="response" class="" />
     </div>
   </div>

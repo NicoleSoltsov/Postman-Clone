@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div><!-- similar to params --></div>
 </template>
 
 <script setup lang="ts"></script>

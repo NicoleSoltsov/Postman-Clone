@@ -2,7 +2,7 @@
   <div class="container">
     <h1>Postman Clone</h1>
     <RequestBar @response="handleResponse" />
-    <InputTabs />
+    <InputTabs /><!-- should depend on http request -->
     <div class="flex gap-4 mt-4">
       <ResponseViewer :response="response" class="" />
     </div>

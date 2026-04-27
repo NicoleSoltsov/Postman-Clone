@@ -7,7 +7,7 @@
       class="px-4 py-2 text-sm"
       :class="[
         activeTab === tab
-          ? 'border-b-2 border-blue-500 text-white'
+          ? 'border-b-2 border-blue-500 text-black'
           : 'text-gray-400 hover:text-white',
       ]"
     >
@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-const tabs = ["Params", "Headers", "Body", "Tests"];
+const tabs = ["Params", "Headers", "Body", "Auth"];
 const activeTab = ref(tabs[0]);
 
 const params = ref<{ key: string; value: string; enabled: boolean }[]>([
@@ -55,6 +55,8 @@ const auth = ref({
   type: "none", // bearer | basic | api-key
   token: "",
 });
+
+//incorporate all of these into the request payload when sending request
 </script>
 
 <style scoped></style>

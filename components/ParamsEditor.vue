@@ -1,22 +1,19 @@
 <template>
-  <div class="w-full bg-white rounded-lg x">
+  <div class="w-full bg-white rounded-lg">
     <div class="divide-y">
       <div
-        v-for="(row, index) in rows"
+        v-for="(row, index) in modelValue"
+        :key="index"
         class="grid grid-cols-12 items-center px-4 py-2 gap-2 hover:bg-gray-50"
       >
         <div class="col-span-1 flex justify-center">
-          <input
-            type="checkbox"
-            class="w-4 h-4 text-blue-600 border-gray-300 rounded"
-            v-model="row.enabled"
-          />
+          <input type="checkbox" class="w-4 h-4" v-model="row.enabled" />
         </div>
 
         <input
           type="text"
           placeholder="Key"
-          class="col-span-4 px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="col-span-4 px-2 py-1 text-sm border rounded-md focus:ring-2 focus:ring-blue-500 outline-none font-mono"
           v-model="row.key"
           @input="onInput(index)"
         />
@@ -24,17 +21,14 @@
         <input
           type="text"
           placeholder="Value"
-          class="col-span-5 px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="col-span-5 px-2 py-1 text-sm border rounded-md focus:ring-2 focus:ring-blue-500 outline-none font-mono"
           v-model="row.value"
           @input="onInput(index)"
         />
 
-        <div
-          class="col-span-2 flex justify-end space-x-2"
-          v-if="rows.length > 1"
-        >
+        <div class="col-span-2 flex justify-end" v-if="modelValue.length > 1">
           <button
-            class="text-gray-400 hover:text-gray-600"
+            class="text-gray-400 hover:text-red-500"
             @click="deleteRow(index)"
           >
             ✕
@@ -53,25 +47,41 @@
 
 <script setup lang="ts">
 //var for rows/# of key-value pairs, add new row when user types in last row, add delete button to delete row, add checkbox to enable/disable
-const rows = ref([{ key: "", value: "", enabled: true }]);
+
+type ParamRow = { key: string; value: string; enabled: boolean };
+
+const props = defineProps<{
+  modelValue: ParamRow[];
+}>();
+
+const emit = defineEmits(["update:modelValue"]);
+
+function update(rows: ParamRow[]) {
+  emit("update:modelValue", rows);
+}
 
 function addRow() {
-  rows.value.push({ key: "", value: "", enabled: true });
+  //updates w new row added
+  update([...props.modelValue, { key: "", value: "", enabled: true }]);
 }
 
 function deleteRow(index: number) {
-  rows.value.splice(index, 1);
+  const newRows = [...props.modelValue];
+  newRows.splice(index, 1);
+  update(newRows);
 }
 
 function onInput(index: number) {
-  //adds new row when user types in last row
-  const isLast = index === rows.value.length - 1;
-  const row = rows.value[index];
+  const rows = [...props.modelValue];
+
+  const isLast = index === rows.length - 1;
+  const row = rows[index];
 
   const hasContent = row && (row.key.trim() !== "" || row.value.trim() !== "");
 
   if (isLast && hasContent) {
-    addRow();
+    rows.push({ key: "", value: "", enabled: true });
+    update(rows);
   }
 }
 </script>

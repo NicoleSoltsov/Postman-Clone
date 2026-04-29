@@ -2,7 +2,7 @@
   <div class="w-full bg-white rounded-lg x">
     <div class="divide-y">
       <div
-        v-for="row in rows"
+        v-for="(row, index) in rows"
         class="grid grid-cols-12 items-center px-4 py-2 gap-2 hover:bg-gray-50"
       >
         <div class="col-span-1 flex justify-center">
@@ -18,6 +18,7 @@
           placeholder="Key"
           class="col-span-4 px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           v-model="row.key"
+          @input="onInput(index)"
         />
 
         <input
@@ -25,10 +26,17 @@
           placeholder="Value"
           class="col-span-5 px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           v-model="row.value"
+          @input="onInput(index)"
         />
 
-        <div class="col-span-2 flex justify-end space-x-2">
-          <button class="text-gray-400 hover:text-gray-600" @click="deleteRow">
+        <div
+          class="col-span-2 flex justify-end space-x-2"
+          v-if="rows.length > 1"
+        >
+          <button
+            class="text-gray-400 hover:text-gray-600"
+            @click="deleteRow(index)"
+          >
             ✕
           </button>
         </div>
@@ -53,5 +61,17 @@ function addRow() {
 
 function deleteRow(index: number) {
   rows.value.splice(index, 1);
+}
+
+function onInput(index: number) {
+  //adds new row when user types in last row
+  const isLast = index === rows.value.length - 1;
+  const row = rows.value[index];
+
+  const hasContent = row && (row.key.trim() !== "" || row.value.trim() !== "");
+
+  if (isLast && hasContent) {
+    addRow();
+  }
 }
 </script>

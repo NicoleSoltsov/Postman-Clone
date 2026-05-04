@@ -59,6 +59,19 @@ function formatBody() {
     }
   }
 }
+
+watch(body, () => {
+  if (contentType.value === "json") {
+    try {
+      JSON.parse(body.value);
+      error.value = "";
+    } catch {
+      error.value = "Invalid JSON";
+    }
+  } else {
+    error.value = "";
+  }
+});
 </script>
 
 <style scoped></style>

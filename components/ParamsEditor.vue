@@ -2,14 +2,13 @@
   <div class="w-full bg-white rounded-lg">
     <div class="divide-y">
       <div
-        v-for="(row, index) in modelValue"
+        v-for="(row, index) in model"
         :key="index"
         class="grid grid-cols-12 items-center px-4 py-2 gap-2 hover:bg-gray-50"
       >
         <div class="col-span-1 flex justify-center">
           <input type="checkbox" class="w-4 h-4" v-model="row.enabled" />
         </div>
-
         <input
           type="text"
           placeholder="Key"
@@ -26,7 +25,7 @@
           @input="onInput(index)"
         />
 
-        <div class="col-span-2 flex justify-end" v-if="modelValue.length > 1">
+        <div class="col-span-2 flex justify-end" v-if="model.length > 1">
           <button
             class="text-gray-400 hover:text-red-500"
             @click="deleteRow(index)"
@@ -37,51 +36,48 @@
       </div>
     </div>
 
-    <div class="px-4 py-2">
-      <button class="text-sm text-blue-600 hover:underline" @click="addRow">
-        + Add Param
-      </button>
-    </div>
+    <button @click="addRow" class="bg-blue-500 text-white px-3 py-1 rounded">
+      Add
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-//var for rows/# of key-value pairs, add new row when user types in last row, add delete button to delete row, add checkbox to enable/disable
+type ParamRow = {
+  key: string;
+  value: string;
+  enabled: boolean;
+};
 
-type ParamRow = { key: string; value: string; enabled: boolean };
-
-const props = defineProps<{
-  modelValue: ParamRow[];
-}>();
-
-const emit = defineEmits(["update:modelValue"]);
-
-function update(rows: ParamRow[]) {
-  emit("update:modelValue", rows);
-}
+const model = defineModel<ParamRow[]>({
+  required: true,
+});
 
 function addRow() {
-  //updates w new row added
-  update([...props.modelValue, { key: "", value: "", enabled: true }]);
+  model.value.push({
+    key: "",
+    value: "",
+    enabled: true,
+  });
 }
 
 function deleteRow(index: number) {
-  const newRows = [...props.modelValue];
-  newRows.splice(index, 1);
-  update(newRows);
+  model.value.splice(index, 1);
 }
 
 function onInput(index: number) {
-  const rows = [...props.modelValue];
+  // only react if typing in the last row
+  const isLast = index === model.value.length - 1;
 
-  const isLast = index === rows.length - 1;
-  const row = rows[index];
+  if (!isLast) return;
 
-  const hasContent = row && (row.key.trim() !== "" || row.value.trim() !== "");
+  const row = model.value[index];
+  if (!row) return;
+  const hasContent = row.key.trim() !== "" || row.value.trim() !== "";
 
-  if (isLast && hasContent) {
-    rows.push({ key: "", value: "", enabled: true });
-    update(rows);
+  // add a new empty row once user starts typing
+  if (hasContent) {
+    addRow();
   }
 }
 </script>

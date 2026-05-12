@@ -1,7 +1,9 @@
 <template>
-  <div><!-- similar to params --></div>
+  <ParamsEditor v-model="model" />
 </template>
 
-<script setup lang="ts"></script>
-
-<style scoped></style>
+<script setup lang="ts">
+const model = defineModel<any[]>({
+  required: true,
+});
+</script>

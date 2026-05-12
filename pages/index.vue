@@ -1,20 +1,55 @@
 <template>
-  <div class="container">
-    <h1>Postman Clone</h1>
-    <RequestBar @response="handleResponse" />
-    <InputTabs /><!-- should depend on http request -->
-    <div class="flex gap-4 mt-4">
-      <ResponseViewer :response="response" class="" />
-    </div>
+  <div class="space-y-4 p-6">
+    <RequestBar :request-config="requestConfig" @response="response = $event" />
+
+    <InputTabs v-model="requestConfig" />
+    <!-- should depend on http request -->
+
+    <ResponseViewer :response="response" />
   </div>
 </template>
 
 <script setup lang="ts">
-const response = ref();
+export interface KeyValueItem {
+  key: string;
+  value: string;
+  enabled: boolean;
+}
 
-const handleResponse = (res: ApiResponse) => {
-  response.value = res;
-};
+export interface RequestConfig {
+  params: KeyValueItem[];
+  headers: KeyValueItem[];
+  body: {
+    type: string;
+    content: string;
+  };
+  auth: {
+    type: string;
+    token: string;
+  };
+}
+
+const requestConfig = reactive<RequestConfig>({
+  params: [{ key: "", value: "", enabled: true }],
+
+  headers: [
+    {
+      key: "Content-Type",
+      value: "application/json",
+      enabled: true,
+    },
+  ],
+
+  body: {
+    type: "json",
+    content: "",
+  },
+
+  auth: {
+    type: "none",
+    token: "",
+  },
+});
+
+const response = ref<any>(null);
 </script>
-
-<style scoped></style>

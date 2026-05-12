@@ -1,9 +1,9 @@
 <template>
-  <div class="space-y-2">
+  <div class="space-y-3">
     <!-- toolbar -->
     <div class="flex items-center gap-4">
       <select
-        v-model="contentType"
+        v-model="model.type"
         class="bg-gray-800 text-gray-300 px-2 py-1 rounded"
       >
         <option value="json">JSON</option>
@@ -32,7 +32,7 @@
         </div>
       </div>
       <textarea
-        v-model="body"
+        v-model="model.content"
         placeholder="Enter request body..."
         class="flex-1 px-2 py-2 rounded-r outline-none resize-none font-mono text-sm leading-5 h-64"
       ></textarea>
@@ -41,29 +41,32 @@
 </template>
 
 <script setup lang="ts">
+const model = defineModel<any>({
+  required: true,
+});
+
 const error = ref("");
 const contentType = ref<"json" | "text" | "xml">("json");
-const body = ref("");
 const lineCount = computed(() => {
-  return body.value.split("\n").length;
+  return model.value.content.split("\n").length;
 });
 
 function formatBody() {
   error.value = "";
   if (contentType.value === "json") {
     try {
-      const parsed = JSON.parse(body.value);
-      body.value = JSON.stringify(parsed, null, 2); //the 2 is the indent
+      const parsed = JSON.parse(model.value.content);
+      model.value.content = JSON.stringify(parsed, null, 2); //the 2 is the indent
     } catch (e) {
       error.value = "Invalid JSON"; //can only format if in valid JSON
     }
   }
 }
 
-watch(body, () => {
+watch(model.value.content, () => {
   if (contentType.value === "json") {
     try {
-      JSON.parse(body.value);
+      JSON.parse(model.value.content);
       error.value = "";
     } catch {
       error.value = "Invalid JSON";
